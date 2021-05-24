@@ -66,10 +66,6 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end()
 })
 
-const generateId = (maxNumber) => {
-    return Math.floor(Math.random() * maxNumber)
-}
-
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
@@ -79,22 +75,14 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    const existing = persons.find(p => p.name === body.name)
-    if (existing) {
-        return response.status(400).json({
-            error: 'name must be unique'
-        })
-    }
-
-    const person = {
+    const person = new Person({
         name: body.name,
         number: body.number,
-        id: generateId(99999999),
-    }
+    })
 
-    persons = persons.concat(person)
-
-    response.json(person)
+    person.save().then(savedPerson => {
+        response.json(savedPerson)
+    })
 })
 
 const PORT = process.env.PORT || 3001
